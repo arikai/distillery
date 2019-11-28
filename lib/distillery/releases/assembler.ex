@@ -560,7 +560,18 @@ defmodule Distillery.Releases.Assembler do
     Shell.debug("Generating start_erl.data")
     version = rel.version
     contents = "ERTS_VSN #{version}"
-    File.write(Path.join([Release.version_path(rel), "..", "start_erl.data"]), contents)
+
+    rel_path = Release.version_path(rel)
+    base_name = "start_erl.data"
+
+    inner_path = Path.join([rel_path, base_name])
+    rel_path = Path.join([rel_path, "..", base_name])
+
+    with :ok <- File.write(inner_path, contents),
+         :ok <- File.write(rel_path, contents)
+    do
+      :ok
+    end
   end
 
   defp generate_start_erl_data(%Release{profile: %Profile{erts_version: erts}} = release) do
